@@ -2,6 +2,8 @@
 
 A practical React + TypeScript demonstration of the "make illegal state unrepresentable" principle.
 
+**[Live Demo](https://m44rten1.github.io/make-illegal-state-unrepresentable-example/)**
+
 ## The Problem
 
 When managing async state with boolean flags, you create **impossible state combinations**:
