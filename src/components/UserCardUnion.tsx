@@ -1,13 +1,14 @@
 import { useState } from "react";
+import { match } from "ts-pattern";
 import { useFetchUserUnion } from "../hooks/useFetchUnion";
 import { User } from "../types/user";
 import "./UserCard.css";
 
 /**
- * CORRECT PATTERN Component: Uses discriminated union for state
+ * CORRECT PATTERN Component: Uses discriminated union + ts-pattern
  *
- * Notice how the switch statement handles each case explicitly.
- * TypeScript will warn us if we forget to handle a case!
+ * ts-pattern's match().exhaustive() handles each case explicitly.
+ * If we forget to handle a case or add a new status, we get a compile error!
  * Each case has access to exactly the data it needs.
  */
 export function UserCardUnion() {
@@ -19,43 +20,24 @@ export function UserCardUnion() {
     setUserId((prev) => (prev % 10) + 1); // Cycle through users 1-10
   };
 
-  // BENEFIT: We use a switch on the discriminant (status)
-  // TypeScript ensures we handle all cases.
-  // Each case knows exactly what data is available.
-  // Impossible states simply don't exist!
-
-  const renderContent = () => {
-    switch (state.status) {
-      case "idle":
-        return <IdleDisplay onFetch={handleFetch} />;
-
-      case "loading":
-        return <LoadingSpinner />;
-
-      case "error":
-        // TypeScript KNOWS state.error exists here!
-        return <ErrorDisplay error={state.error} onRetry={handleFetch} />;
-
-      case "success":
-        // TypeScript KNOWS state.data exists here!
-        return <UserDisplay user={state.data} onFetchAnother={handleFetch} />;
-
-      // If we add a new status in the future and forget to handle it,
-      // TypeScript will give us a compile error here:
-      default: {
-        const _exhaustive: never = state;
-        return _exhaustive;
-      }
-    }
-  };
-
   return (
     <div className="user-card">
       <div className="card-header">
         <span className="badge badge-success">Discriminated Union</span>
         <h3>User Profile</h3>
       </div>
-      <div className="card-content">{renderContent()}</div>
+      <div className="card-content">
+        {match(state)
+          .with({ status: "idle" }, () => <IdleDisplay onFetch={handleFetch} />)
+          .with({ status: "loading" }, () => <LoadingSpinner />)
+          .with({ status: "error" }, ({ error }) => (
+            <ErrorDisplay error={error} onRetry={handleFetch} />
+          ))
+          .with({ status: "success" }, ({ data }) => (
+            <UserDisplay user={data} onFetchAnother={handleFetch} />
+          ))
+          .exhaustive()}
+      </div>
       <div className="card-footer">
         <button className="btn btn-secondary" onClick={reset}>
           Reset
