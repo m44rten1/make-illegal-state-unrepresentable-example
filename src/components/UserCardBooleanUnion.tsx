@@ -31,7 +31,7 @@ export function UserCardBooleanUnion() {
           .with({ data: P.nonNullable }, ({ data }) => (
             <UserDisplay user={data} onFetchAnother={handleFetch} />
           ))
-          .with({ isLoading: false }, () => (
+          .with({ isLoading: false, isError: false }, () => (
             <IdleDisplay onFetch={handleFetch} />
           ))
           .exhaustive()}
