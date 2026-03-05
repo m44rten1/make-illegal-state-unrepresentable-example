@@ -42,6 +42,27 @@ export interface BooleanFetchState<T> {
   error: Error | null;
 }
 
+export type BooleanUnionFetchState<T> = {
+  // idle
+  isLoading: false;
+  isError: false;
+} | {
+  // loading
+  isLoading: true;
+  isError: false;
+} | {
+  // error
+  isLoading: false;
+  isError: true;
+  error: Error;
+} | {
+  // success
+  isLoading: false;
+  isError: false;
+  data: T;
+}
+
+
 // ============================================================================
 // CORRECT PATTERN: Discriminated Union
 // ============================================================================
